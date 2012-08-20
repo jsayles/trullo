@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>{% block title %}{% endblock %}{{ site.name }}</title>
+		<meta name="description" content="{% block meta-description %}{% endblock %}">
+		<meta name="author" content="{% block meta-author %}{% endblock %}">
+
+		<link rel="shortcut icon" href="{{STATIC_URL}}favicon.png" />
+		<link rel="apple-touch-icon" href="{{STATIC_URL}}favicon.png" />
+
+		<link rel="stylesheet" href="{{STATIC_URL}}bootstrap/css/bootstrap.css">
+		<link rel="stylesheet" href="{{STATIC_URL}}bootstrap/css/bootstrap-responsive.css">
+		<link rel="stylesheet" href="{{STATIC_URL}}base.css">
+		<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+		{% block head-extras-app %}{% endblock %}
+		{% block head-extras-page %}{% endblock %}
+	</head>
+
+	<body>
+
+	{% block navbar %}
+	<div class="navbar">
+	  <div class="navbar-inner">
+		<div class="container">
+		  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		  </a>
+		  <a class="brand" href="#">{{ site.name }}</a>
+		  <div class="nav-collapse">
+			<ul class="nav">
+			  <li class="active"><a href="#">Home</a></li>
+			  <li><a href="#about">About</a></li>
+			  {% if request.user.is_staff %}
+			  	<li><a href="{% url admin:index %}">Admin</a></li>
+			  {% endif %}
+			</ul>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	{% endblock %}
+	<div id="pageView" class="container-fluid"></div>
+
+	<script src="{{STATIC_URL}}jquery.1.7.2.js"></script>
+	<script src="{{STATIC_URL}}underscore-min.js"></script>
+	<script src="{{STATIC_URL}}json/json2.js"></script>
+	<script src="{{STATIC_URL}}backbone-min.js"></script>
+	<script src="{{STATIC_URL}}laconic.js"></script>
+
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-collapse.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-dropdown.js"></script>
+	<!--
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-tab.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-transition.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-alert.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-modal.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-scrollspy.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-tooltip.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-popover.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-button.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-carousel.js"></script>
+	<script src="{{STATIC_URL}}bootstrap/js/bootstrap-typeahead.js"></script>
+	-->
+	<script src="{{STATIC_URL}}base.js"></script>
+
+	<script type="text/html" id='aboutTemplate'>
+		<h1>About:</h1>
+	</script>
+	</body>
+</html>
