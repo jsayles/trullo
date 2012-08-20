@@ -1,0 +1,13 @@
+
+django>=1.4
+pytz
+docutils
+south
+markdown
+pil
+feedparser
+psycopg2
+simplejson
+tweepy
+twitter
+gunicorn

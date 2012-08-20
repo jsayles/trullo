@@ -1,0 +1,39 @@
+TIME_ZONE = 'America/Vancouver'
+
+LANGUAGE_CODE = 'en-us'
+
+SITE_ID = 1
+
+SECRET_KEY = 'SOME_JUNK_HERE'
+
+TWITTER_USERNAME = 'username'
+TWITTER_LOG_SLUG = 'tweets'
+TWITTER_CONSUMER_KEY = 'OAuth consumer key'
+TWITTER_CONSUMER_SECRET = 'OAuth consumer secret'
+TWITTER_ACCESS_KEY = 'OAuth access key'
+TWITTER_ACCESS_SECRET = 'OAuth access secret'
+
+LOG_FILE_PATH = '/tmp/trullo.log'
+ADMINS = (('Your Name', 'something-or-other@exampleolio.com'),)
+MANAGERS = ADMINS
+
+PRODUCTION = False
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+
+#CACHE_BACKEND = 'dummy:///'
+CACHE_BACKEND = 'locmem:///'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'trullo',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': '',
+        'PORT': '',
+    }
+}
+
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename=LOG_FILE_PATH, filemode = 'w')

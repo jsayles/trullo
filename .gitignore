@@ -1,0 +1,6 @@
+*.pyc
+*.swp
+pip-log.txt
+backups
+local_settings.py
+media/*
