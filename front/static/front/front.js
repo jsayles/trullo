@@ -1,37 +1,37 @@
-var onepage = onepage || {};
-onepage.views = onepage.views || {};
+var trullo = trullo || {};
+trullo.views = trullo.views || {};
 
-onepage.Router = Backbone.Router.extend({
+trullo.Router = Backbone.Router.extend({
 	routes: {
 		"":"home",
 		"about":"about",
 	},
 	home: function(){
-		onepage.activateNav('#');
+		trullo.activateNav('#');
 		$('.routeView').hide();
 		$('#homeView').show();
 	},
 
 	about: function() {
-		onepage.activateNav('#about');
+		trullo.activateNav('#about');
 		$('.routeView').hide();
 		$('#aboutView').show();
 	},
 });
-window.router = new onepage.Router();
+window.router = new trullo.Router();
 
-onepage.activateNav = function(hash){
+trullo.activateNav = function(hash){
 	$('.nav li').attr('class', 'inactive');
 	$('a[href=' + hash + ']').parent().attr('class', 'active');
 }
 
-onepage.views.PageView = Backbone.View.extend({
+trullo.views.PageView = Backbone.View.extend({
 	id: 'pageView',
 
 	initialize: function(){
-		this.aboutView = new onepage.views.AboutView();
+		this.aboutView = new trullo.views.AboutView();
 		this.$el.append(this.aboutView.render().el);
-		this.homeView = new onepage.views.HomeView();
+		this.homeView = new trullo.views.HomeView();
 		this.$el.append(this.homeView.render().el);
 	},
 
@@ -40,33 +40,42 @@ onepage.views.PageView = Backbone.View.extend({
 	},
 });
 
-onepage.views.HomeView = Backbone.View.extend({
+trullo.views.HomeView = Backbone.View.extend({
 	className: 'routeView',
 	id: 'homeView',
 	initialize: function(){
 		_.bindAll(this, 'render');
+		this.projectCollection = new schema.ProjectCollection();
+		this.projectCollectionView = new publish.views.ProjectCollectionView({collection:this.projectCollection})
+		this.projectCollection.fetch();
+
+		this.ideaCollection = new schema.IdeaCollection();
+		this.ideaCollectionView = new publish.views.IdeaCollectionView({collection:this.ideaCollection})
+		this.ideaCollection.fetch();
 	},
 	render: function(){
 		this.$el.append($.el.h1('Home:'));
+		this.$el.append(this.projectCollectionView.render().el);
+		this.$el.append(this.ideaCollectionView.render().el);
 		return this;
 	},
 });
 
-onepage.views.AboutView = Backbone.View.extend({
+trullo.views.AboutView = Backbone.View.extend({
 	className: 'routeView',
 	id: 'aboutView',
 	initialize: function(){
 		_.bindAll(this, 'render');
-		this.template = $("#aboutTemplate").html();
 	},
 	render: function(){
-		this.$el.html(_.template(this.template, {}));
+		this.$el.append($.el.h1('About:'));
 		return this;
 	},
 });
 
-$(document).ready(function(){
-	window.pageView = new onepage.views.PageView({el:"#pageView"});
+schema.tastyPieSchema.on('populated', function(){
+	window.pageView = new trullo.views.PageView({el:$('#pageView')});
 	window.pageView.render();
 	Backbone.history.start();
+	console.log('started');
 });

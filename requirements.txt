@@ -3,6 +3,7 @@ django>=1.4
 pytz
 docutils
 south
+django-tastypie
 markdown
 pil
 feedparser
@@ -11,3 +12,5 @@ simplejson
 tweepy
 twitter
 gunicorn
+
+-e git+git://github.com/PaulUithol/backbone-tastypie.git#egg=backbone_tastypie

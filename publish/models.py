@@ -95,7 +95,7 @@ class Idea(models.Model):
 class Project(models.Model):
 	"""A work or personal project description."""
 	title = models.CharField(max_length=1024, blank=False, null=False)
-	slug = models.SlugField(blank=False, null=False)
+	slug = models.SlugField(blank=False, null=False, unique=True)
 	description = models.TextField(blank=True, null=True)
 	started = models.DateField(blank=False, null=False)
 	ended = models.DateField(blank=True, null=True)
@@ -103,8 +103,8 @@ class Project(models.Model):
 	portfolio = models.BooleanField(default=False, blank=False, null=False)
 	photos = models.ManyToManyField(Photo, blank=True, null=True)
 	url = models.URLField(null=True, blank=True)
-	def __unicode__(self):
-		return self.title
+
+	def __unicode__(self): return self.title
 	class Meta:
 		ordering = ['-started']
 
@@ -263,4 +263,7 @@ class ImageEntry(models.Model):
 		ordering = ['-created']
 	def __unicode__(self):
 		return self.image
-	
+
+
+# Copyright 2012 Trevor F. Smith (http://trevor.smith.name/) 
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
