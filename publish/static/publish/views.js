@@ -2,7 +2,7 @@ var publish = publish || {};
 publish.views = publish.views || {};
 
 publish.views.AbstractCollectionView = Backbone.View.extend({
-	tagName: 'ul',
+	tagName: 'section',
 	initialize: function(){
 		_.bindAll(this, 'render', 'add', 'remove', 'reset');
 		this.$el.addClass('collection-view');
@@ -19,12 +19,15 @@ publish.views.AbstractCollectionView = Backbone.View.extend({
 	},
 	add: function(item){
 		this.itemViews[this.itemViews.length] = new this.itemView({model:item});
-		this.$el.append(this.itemViews[this.itemViews.length - 1].render().el);
+		this.$el.find('ul').append(this.itemViews[this.itemViews.length - 1].render().el);
 	},
 	remove: function(idea){
 		console.log('remove', arguments);
 	},
 	render: function(){
+		this.$el.empty();
+		if(this.options.title) this.$el.append($.el.h1(this.options.title));
+		this.$el.append($.el.ul());
 		return this;
 	},
 })
@@ -34,13 +37,19 @@ publish.views.AbstractItemView = Backbone.View.extend({
 	initialize: function(){
 		_.bindAll(this, 'render');
 		this.$el.addClass('item-view');
+		if(this.options.additionalClasses){
+			for(var i=0; i < this.options.additionalClasses.length; i++){
+				this.$el.addClass(this.options.additionalClasses);
+			}
+		}
 	},
 });
 
 publish.views.IdeaItemView = publish.views.AbstractItemView.extend({
 	className: 'idea-item-view',
 	render: function(){
-		this.$el.append($.el.h3(this.model.get('title')));
+		this.$el.append($('<h3 />').html(this.model.get('title')));
+		this.$el.append($('<p />').html(this.model.get('description')));
 		return this;
 	},
 });
@@ -53,7 +62,15 @@ publish.views.IdeaCollectionView = publish.views.AbstractCollectionView.extend({
 publish.views.ProjectItemView = publish.views.AbstractItemView.extend({
 	className: 'project-item-view',
 	render: function(){
-		this.$el.append($.el.h3(this.model.get('title')));
+		if(this.model.get('url')){
+			var title = $.el.h3();
+			this.$el.append(title);
+			var anchor = title.append($.el.a({href:this.model.get('url')}));
+			$(anchor).html(this.model.get('title'));
+		} else {
+			this.$el.append($('<h3 />').html(this.model.get('title')));
+		}
+		this.$el.append($('<p />').html(this.model.get('description')));
 		return this;
 	},
 });

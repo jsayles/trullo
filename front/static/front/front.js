@@ -46,17 +46,21 @@ trullo.views.HomeView = Backbone.View.extend({
 	initialize: function(){
 		_.bindAll(this, 'render');
 		this.projectCollection = new schema.ProjectCollection();
-		this.projectCollectionView = new publish.views.ProjectCollectionView({collection:this.projectCollection})
+		this.projectCollectionView = new publish.views.ProjectCollectionView({title:'Projects:', collection:this.projectCollection})
+		this.projectCollectionView.$el.addClass('span6');
 		this.projectCollection.fetch();
 
 		this.ideaCollection = new schema.IdeaCollection();
-		this.ideaCollectionView = new publish.views.IdeaCollectionView({collection:this.ideaCollection})
+		this.ideaCollectionView = new publish.views.IdeaCollectionView({title: 'Ideas:', collection:this.ideaCollection})
+		this.ideaCollectionView.$el.addClass('span6');
 		this.ideaCollection.fetch();
 	},
 	render: function(){
-		this.$el.append($.el.h1('Home:'));
-		this.$el.append(this.projectCollectionView.render().el);
-		this.$el.append(this.ideaCollectionView.render().el);
+		var row1 = $.el.div({class:'row-fluid'});
+		this.$el.append(row1);
+		row1.append(this.projectCollectionView.render().el);
+		row1.append(this.ideaCollectionView.render().el);
+
 		return this;
 	},
 });
