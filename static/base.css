@@ -1,0 +1,18 @@
+#top-bar {
+	height: 6em;
+	margin-top: 2em;
+}
+#top-bar a {
+	color: #444;
+}
+#top-bar #brand {
+	font-size: 2em;
+	font-weight: bold;
+}
+#top-bar nav {
+	float: right;
+}
+#top-bar nav a {
+	display: inline;
+	padding-left: 2em;
+}

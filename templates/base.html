@@ -23,28 +23,20 @@
 	<body>
 
 	{% block navbar %}
-	<div class="navbar">
-	  <div class="navbar-inner">
-		<div class="container">
-		  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-		  </a>
-		  <a class="brand" href="#">{{ site.name }}</a>
-		  <div class="nav-collapse">
-			<ul class="nav">
-			  <li class="active"><a href="#">Home</a></li>
-			  <li><a href="#about">About</a></li>
-			  {% if request.user.is_staff %}
-			  	<li><a href="{% url admin:index %}">Admin</a></li>
-			  {% endif %}
-			</ul>
-		  </div>
+		<div id="top-bar" class="container-fluid">
+			<nav>
+				<a href="{% url front.views.index %}">News</a>
+				<a href="">Portfolio</a>
+				<a href="">About</a>
+				<a href="">Contact</a>
+				{% if request.user.is_staff %}
+					<a href="{% url admin:index %}">Admin</a>
+				{% endif %}
+			</nav>
+			<a id="brand" href="{% url front.views.index %}">{{ site.name }}</a>
 		</div>
-	  </div>
-	</div>
 	{% endblock %}
+
 	<div id="pageView" class="container-fluid">{% block page-view %}{% endblock %}</div>
 
 	<script src="{{STATIC_URL}}jquery.1.7.2.js"></script>
