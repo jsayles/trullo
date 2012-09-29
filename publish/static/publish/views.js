@@ -18,6 +18,12 @@ publish.views.AbstractCollectionView = Backbone.View.extend({
 		}
 	},
 	add: function(item){
+		if(this.options.filter){
+			var filterName = this.options.filter[0];
+			var filterTargetValue = this.options.filter[1];
+			var val = item.get(filterName, null);
+			if(val != filterTargetValue) return;
+		}
 		this.itemViews[this.itemViews.length] = new this.itemView({model:item});
 		this.$el.find('ul').append(this.itemViews[this.itemViews.length - 1].render().el);
 	},

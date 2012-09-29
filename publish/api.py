@@ -1,6 +1,7 @@
 from tastypie.api import Api
-from tastypie.resources import ModelResource
 from datetime import datetime, timedelta, date
+from tastypie.authorization import DjangoAuthorization
+from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -29,6 +30,12 @@ class ProjectResource(ModelResource):
 		]
 
 class IdeaResource(ModelResource):
+
+	def get_object_list(self, request):
+		items = super(IdeaResource, self).get_object_list(request)
+		if request.user.is_authenticated(): return items
+		return items.filter(public=True)
+
 	class Meta:
 		queryset = Idea.objects.all()
 

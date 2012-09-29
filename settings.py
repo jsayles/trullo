@@ -63,6 +63,9 @@ INSTALLED_APPS = (
 	'trullo.staff',
 )
 
+# Tasty Pie settings
+API_LIMIT_PER_PAGE = 1000
+
 from local_settings import *
 
 # Copyright 2012 Trevor F. Smith (http://trevor.smith.name/) 
