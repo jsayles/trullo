@@ -85,3 +85,23 @@ publish.views.ProjectCollectionView = publish.views.AbstractCollectionView.exten
 	className: 'project-collection-view',
 	itemView: publish.views.ProjectItemView,
 });
+
+publish.views.ProjectsView = Backbone.View.extend({
+	className: 'routeView',
+	initialize: function(){
+		_.bindAll(this, 'render');
+		this.projectCollection = new schema.ProjectCollection();
+		this.portfolioCollectionView = new publish.views.ProjectCollectionView({collection:this.projectCollection, filter:['portfolio', true]})
+		this.portfolioCollectionView.$el.addClass('span6');
+		this.projectCollectionView = new publish.views.ProjectCollectionView({collection:this.projectCollection, filter:['portfolio', false]})
+		this.projectCollectionView.$el.addClass('span6');
+		this.projectCollection.fetch();
+	},
+	render: function(){
+		var row1 = $.el.div({class:'row-fluid'});
+		this.$el.append(row1);
+		row1.append(this.portfolioCollectionView.render().el);
+		row1.append(this.projectCollectionView.render().el);
+		return this;
+	},
+});

@@ -2,7 +2,9 @@ from django.conf import settings
 from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('',
-    (r'^$', 'trullo.front.views.index'),
+    (r'^$', 'front.views.index'),
+    (r'^about/$', 'front.views.about'),
+    (r'^contact/$', 'front.views.contact'),
 )
 
 # Copyright 2012 Trevor F. Smith (http://trevor.smith.name/) 

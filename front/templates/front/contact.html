@@ -1,13 +1,16 @@
 {% extends "front/base.html" %}
 
+{% block title %}Contact | {% endblock %}
+
+
 {% block script-extras-page %}
 <script>
 	$(document).ready(function(){
-		$('a.index-nav').addClass('selected');
+		$('a.contact-nav').addClass('selected');
 	});
 
 	schema.tastyPieSchema.on('populated', function(){
-		window.pageView = new trullo.views.IndexView({el:$('#pageView')});
+		window.pageView = new trullo.views.ContactView({el:$('#pageView')});
 		window.pageView.render();
 	});
 </script>

@@ -24,13 +24,11 @@ from django.http import HttpResponse, Http404, HttpResponseServerError, HttpResp
 from publish.models import Project, LogEntry, Link
 from publish.forms import LinkForm
 
-def index(request):
-	current_projects = Project.objects.filter(public=True, portfolio=True, ended=None)
-	previous_projects = Project.objects.filter(public=True, portfolio=True).exclude(ended=None)
-	latest = list(LogEntry.objects.public_entries()[:10])
-	latest.extend(Link.objects.public_entries()[:10])
-	latest.sort(item_cmp)
-	return render_to_response('front/index.html', { 'latest':latest, 'current_projects':current_projects, 'previous_projects':previous_projects }, context_instance=RequestContext(request))
+def index(request): return render_to_response('front/index.html', { }, context_instance=RequestContext(request))
+
+def about(request): return render_to_response('front/about.html', { }, context_instance=RequestContext(request))
+
+def contact(request): return render_to_response('front/contact.html', { }, context_instance=RequestContext(request))
 
 @login_required
 def link_popup(request):
