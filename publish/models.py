@@ -178,7 +178,7 @@ class LogEntry(models.Model):
 		return 'No Subject'
 	def get_absolute_url(self):
 		if self.source_url: return str(self.source_url)
-		return reverse('trullo.publish.views.log_entry_detail', args=[], kwargs={ 'slug':self.log.slug, 'pk':self.id })
+		return reverse('publish.views.log_entry_detail', args=[], kwargs={ 'slug':self.log.slug, 'pk':self.id })
 	class Meta:
 		verbose_name_plural = "log entries"
 		ordering = ['-issued']

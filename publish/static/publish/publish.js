@@ -1,57 +1,23 @@
 var publish = publish || {};
 publish.views = publish.views || {};
 
-publish.views.AbstractCollectionView = Backbone.View.extend({
-	tagName: 'section',
-	initialize: function(){
-		_.bindAll(this, 'render', 'add', 'remove', 'reset');
-		this.$el.addClass('collection-view');
-		this.itemViews = [];
-
-		this.collection.on('add', this.add);
-		this.collection.on('remove', this.remove);
-		this.collection.on('reset', this.reset);
-	},
-	reset: function(){
-		for(var i=0; i < this.collection.length; i++){
-			this.add(this.collection.at(i));
-		}
-	},
-	add: function(item){
-		if(this.options.filter){
-			var filterName = this.options.filter[0];
-			var filterTargetValue = this.options.filter[1];
-			var val = item.get(filterName, null);
-			if(val != filterTargetValue) return;
-		}
-		this.itemViews[this.itemViews.length] = new this.itemView({model:item});
-		this.$el.find('ul').append(this.itemViews[this.itemViews.length - 1].render().el);
-	},
-	remove: function(idea){
-		console.log('remove', arguments);
-	},
+publish.views.LogEntryItemView = views.AbstractItemView.extend({
+	className: 'log-entry-view',
 	render: function(){
-		this.$el.empty();
-		if(this.options.title) this.$el.append($.el.h1(this.options.title));
-		this.$el.append($.el.ul());
-		return this;
-	},
-})
-
-publish.views.AbstractItemView = Backbone.View.extend({
-	tagName: 'li',
-	initialize: function(){
-		_.bindAll(this, 'render');
-		this.$el.addClass('item-view');
-		if(this.options.additionalClasses){
-			for(var i=0; i < this.options.additionalClasses.length; i++){
-				this.$el.addClass(this.options.additionalClasses);
-			}
+		this.$el.append($.el.h3($.el.a({href:this.model.get('absolute_url')}, this.model.get('subject'))));
+		if(this.model.get('source_url')){
+			this.$el.append($.el.p(schema.hostNameFromURL(this.model.get('source_url'))));
 		}
+		return this;
 	},
 });
 
-publish.views.IdeaItemView = publish.views.AbstractItemView.extend({
+publish.views.LogEntryCollectionView = views.AbstractCollectionView.extend({
+	className: 'log-entry-collection-view',
+	itemView: publish.views.LogEntryItemView,
+});
+
+publish.views.IdeaItemView = views.AbstractItemView.extend({
 	className: 'idea-item-view',
 	render: function(){
 		this.$el.append($('<h3 />').html(this.model.get('title')));
@@ -60,12 +26,12 @@ publish.views.IdeaItemView = publish.views.AbstractItemView.extend({
 	},
 });
 
-publish.views.IdeaCollectionView = publish.views.AbstractCollectionView.extend({
+publish.views.IdeaCollectionView = views.AbstractCollectionView.extend({
 	className: 'idea-collection-view',
 	itemView: publish.views.IdeaItemView,
 });
 
-publish.views.ProjectItemView = publish.views.AbstractItemView.extend({
+publish.views.ProjectItemView = views.AbstractItemView.extend({
 	className: 'project-item-view',
 	render: function(){
 		if(this.model.get('url')){
@@ -81,7 +47,7 @@ publish.views.ProjectItemView = publish.views.AbstractItemView.extend({
 	},
 });
 
-publish.views.ProjectCollectionView = publish.views.AbstractCollectionView.extend({
+publish.views.ProjectCollectionView = views.AbstractCollectionView.extend({
 	className: 'project-collection-view',
 	itemView: publish.views.ProjectItemView,
 });
@@ -106,7 +72,7 @@ publish.views.ProjectsView = Backbone.View.extend({
 	},
 });
 
-publish.views.PublicationItemView = publish.views.AbstractItemView.extend({
+publish.views.PublicationItemView = views.AbstractItemView.extend({
 	className: 'publication-item-view',
 	render: function(){
 		this.$el.append($('<h3 />').html('"' + this.model.get('title') + '"'));
@@ -123,7 +89,7 @@ publish.views.PublicationItemView = publish.views.AbstractItemView.extend({
 	},
 });
 
-publish.views.PublicationCollectionView = publish.views.AbstractCollectionView.extend({
+publish.views.PublicationCollectionView = views.AbstractCollectionView.extend({
 	className: 'publication-collection-view',
 	itemView: publish.views.PublicationItemView,
 });
