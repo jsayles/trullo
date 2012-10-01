@@ -34,6 +34,20 @@ schema.TastyPieSchema = Backbone.Model.extend({
 
 schema.tastyPieSchema = new schema.TastyPieSchema();
 
+schema.parseJsonDate = function(jsonDate){
+    var dateString = jsonDate.split('T')[0];
+    var dateArray = dateString.split('-');
+    var date = new Date(dateArray[1] + ' ' + dateArray[2] + ' ' + dateArray[0]);
+    var timeArray = jsonDate.split('T')[1].split(':');
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10));
+}
+
+schema.formatDate = function(jsDate){
+	return schema.MONTH_STRINGS[jsDate.getMonth()] + ' ' + jsDate.getDate() + ', ' + jsDate.getFullYear();
+}
+
+schema.MONTH_STRINGS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 $(document).ready(function(){
 	schema.tastyPieSchema.fetch({success: function(){
 		schema.tastyPieSchema.populate();

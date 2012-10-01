@@ -2,3 +2,9 @@
 	list-style-type: none;
 	margin-left: 0; padding-left: 0;
 }
+
+.publication-item-view { margin-bottom: 1em; }
+.publication-item-view p {
+	margin: 0;
+}
+.publication-item-view a { padding-right: 0.5em; }

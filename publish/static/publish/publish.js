@@ -105,3 +105,42 @@ publish.views.ProjectsView = Backbone.View.extend({
 		return this;
 	},
 });
+
+publish.views.PublicationItemView = publish.views.AbstractItemView.extend({
+	className: 'publication-item-view',
+	render: function(){
+		this.$el.append($('<h3 />').html('"' + this.model.get('title') + '"'));
+		this.$el.append($.el.p(this.model.get('authors'), '.'));
+		var publicationDate = schema.parseJsonDate(this.model.get('publication_date'));
+		this.$el.append($.el.p(this.model.get('venue'), '. ', schema.formatDate(publicationDate), '.'));
+		if(this.model.get('document')){
+			this.$el.append($.el.a({href:this.model.get('document')}, 'download'))
+		}
+		if(this.model.get('source_url')){
+			this.$el.append($.el.a({href:this.model.get('source_url')}, 'source'))
+		}
+		return this;
+	},
+});
+
+publish.views.PublicationCollectionView = publish.views.AbstractCollectionView.extend({
+	className: 'publication-collection-view',
+	itemView: publish.views.PublicationItemView,
+});
+
+publish.views.PublicationsView = Backbone.View.extend({
+	className: 'routeView',
+	initialize: function(){
+		_.bindAll(this, 'render');
+		this.collection = new schema.PublicationCollection();
+		this.collectionView = new publish.views.PublicationCollectionView({collection:this.collection});
+		this.collectionView.$el.addClass('span12');
+		this.collection.fetch();
+	},
+	render: function(){
+		var row1 = $.el.div({class:'row-fluid'});
+		this.$el.append(row1);
+		row1.append(this.collectionView.render().el);
+		return this;
+	},
+});
