@@ -4,7 +4,10 @@ publish.views = publish.views || {};
 publish.views.LogEntryItemView = views.AbstractItemView.extend({
 	className: 'log-entry-view',
 	render: function(){
-		this.$el.append($.el.h3($.el.a({href:this.model.get('absolute_url')}, this.model.get('subject'))));
+		var subject = $.el.h3();
+		this.$el.append(subject);
+		var subjectAnchor = subject.append($.el.a({href:this.model.get('absolute_url')}, this.model.get('subject')));
+		if(this.model.get('source_url', null)) subjectAnchor.setAttribute('rel', 'nofollow');
 		if(this.model.get('source_url')){
 			this.$el.append($.el.p(schema.hostNameFromURL(this.model.get('source_url'))));
 		}
