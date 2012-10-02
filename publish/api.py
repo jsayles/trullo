@@ -1,4 +1,5 @@
 from tastypie.api import Api
+from tastypie.paginator import Paginator
 from datetime import datetime, timedelta, date
 from tastypie.authorization import DjangoAuthorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
@@ -23,7 +24,10 @@ class LogEntryResource(ModelResource):
 		resource_name = 'log-entry'
 		allowed_methods = ['get']
 		include_absolute_url = True
-		
+		paginator_class = Paginator
+		filtering = {
+			"source_url": ('isnull',),
+		}
 	def get_object_list(self, request):
 		objects = super(LogEntryResource, self).get_object_list(request)
 		if request.user.is_authenticated(): return objects

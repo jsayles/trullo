@@ -27,13 +27,37 @@ schema.AbstractTastyPieModel = Backbone.Model.extend({
 });
 
 schema.AbstractTastyPieCollection = Backbone.Collection.extend({
-	url: function(){ return this.list_endpoint; }, 
+	initialize: function(models, options){
+		_.bindAll(this, 'url', 'pageUp', 'pageDown', 'page');
+		this.options = options || {};
+		this.limit = this.options.limit ? parseInt(this.options.limit) : 50;
+		this.offset = this.options.offset ? parseInt(this.options.offset) : 0;
+	},
+	pageUp: function(){ this.page(-1); },
+	pageDown: function(){ this.page(1); },
+	page: function(delta){
+		this.offset = this.offset + (delta * this.limit);
+		if(this.offset < 0) this.offset = 0;
+		this.fetch();
+	},
+	url: function(){
+		result = this.list_endpoint + '?';
+		result = result + 'limit=' + this.limit;
+		if(this.offset > 0){
+			result = result + '&offset=' + this.offset;
+		}
+		if(this.options.filters){
+			for(var name in this.options.filters){
+				result = result + '&' + name + '=' + this.options.filters[name];
+			}
+		}
+		return result;
+	}, 
 });
 
 schema.TastyPieSchema = Backbone.Model.extend({
 	url: '/api/publish/v0.1/',
 	populate: function(){
-		console.log(this.attributes);
 		for(var name in this.attributes){
 			var resourceClassName = schema.javascriptifyResourceName(name);
 			schema[resourceClassName] = schema.AbstractTastyPieModel.extend({
@@ -84,6 +108,7 @@ views.AbstractCollectionView = Backbone.View.extend({
 		this.collection.on('reset', this.reset);
 	},
 	reset: function(){
+		this.render();
 		for(var i=0; i < this.collection.length; i++){
 			this.add(this.collection.at(i));
 		}

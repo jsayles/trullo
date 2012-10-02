@@ -56,7 +56,7 @@ publish.views.ProjectsView = Backbone.View.extend({
 	className: 'routeView',
 	initialize: function(){
 		_.bindAll(this, 'render');
-		this.projectCollection = new schema.ProjectCollection();
+		this.projectCollection = new schema.ProjectCollection({limit:1000});
 		this.portfolioCollectionView = new publish.views.ProjectCollectionView({collection:this.projectCollection, filter:['portfolio', true]})
 		this.portfolioCollectionView.$el.addClass('span6');
 		this.projectCollectionView = new publish.views.ProjectCollectionView({collection:this.projectCollection, filter:['portfolio', false]})
@@ -98,7 +98,7 @@ publish.views.PublicationsView = Backbone.View.extend({
 	className: 'routeView',
 	initialize: function(){
 		_.bindAll(this, 'render');
-		this.collection = new schema.PublicationCollection();
+		this.collection = new schema.PublicationCollection({limit:1000});
 		this.collectionView = new publish.views.PublicationCollectionView({collection:this.collection});
 		this.collectionView.$el.addClass('span12');
 		this.collection.fetch();
