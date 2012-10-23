@@ -1,0 +1,34 @@
+{% extends "publish/base.html" %}
+
+{% block title %}Collect | {% endblock %}
+
+{% block navbar %}<br />{% endblock %}
+
+
+{% block script-extras-page %}
+<script>
+   $(document).ready(function(){
+      $('a.index-nav').addClass('selected');
+   });
+
+   schema.tastyPieSchema.on('populated', function(){
+   });
+</script>
+{% endblock %}
+
+{% block page-view %}
+   {% if page_message %}
+      <p id="page-message">{{ page_message|safe }}</p>
+   {% else %}
+      <form class="collect-form" action="." method="POST">
+         {% for field in collect_form %}
+            {% if field.label == 'Make public' %}public:{% endif %}
+            {{ field.errors }}
+            {{ field }}
+            <br />
+         {% endfor %}
+         {% csrf_token %}
+         <input type="submit" value="collect" />
+      </form>
+   {% endif %}
+{% endblock %}

@@ -34,6 +34,35 @@ from models import Photo, Publication, Idea, Project, Comment, Log, LogEntry, Im
 def index(request):
 	return render_to_response('publish/index.html', { 'logs':Log.objects.all() }, context_instance=RequestContext(request))
 
+@login_required
+def collect(request):
+	return render_to_response('publish/collect.html', { }, context_instance=RequestContext(request))
+
+@login_required
+def collect_form(request):
+	page_message = None
+	if request.method == 'GET':
+		collect_form = CollectForm()
+		if request.GET.has_key('url'): collect_form.initial['url'] = request.GET['url']
+		if request.GET.has_key('title'): collect_form.initial['title'] = request.GET['title']
+		if request.GET.has_key('excerpt') and len(request.GET['excerpt']) > 0:
+			collect_form.initial['excerpt'] = request.GET['excerpt']
+		elif request.GET.has_key('md'):
+			collect_form.initial['excerpt'] = request.GET['md']
+	else:
+		collect_form = CollectForm(request.POST)
+		if collect_form.is_valid():
+			log_entry = LogEntry()
+			log_entry.log = collect_form.cleaned_data['log']
+			log_entry.subject = collect_form.cleaned_data['title']
+			log_entry.content = '<blockquote>%s</blockquote><p class="collection-note">%s</p>' % (collect_form.cleaned_data['excerpt'] or '', collect_form.cleaned_data['note'] or '')
+			log_entry.publish = collect_form.cleaned_data['make_public']
+			log_entry.source_url = collect_form.cleaned_data['url']
+			log_entry.issued = datetime.now()
+			log_entry.save()
+			page_message = 'The <a href="%s">log entry</a> was created.' % reverse('publish.views.log_entry_detail', args=[], kwargs={'slug':log_entry.log.slug, 'pk':log_entry.id})
+	return render_to_response('publish/collect_form.html', { 'collect_form':collect_form, 'page_message':page_message }, context_instance=RequestContext(request))
+
 def update_twitter(request):
 	log = get_object_or_404(Log, slug=settings.TWITTER_LOG_SLUG)
 	twitter_auth = tweepy.OAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
@@ -72,36 +101,6 @@ def merge(request):
 
 def ideas(request):
 	return render_to_response('publish/ideas.html', { 'ideas':Idea.objects.all() }, context_instance=RequestContext(request))
-
-@login_required
-def collect(request):
-	return render_to_response('publish/collect.html', { }, context_instance=RequestContext(request))
-
-@login_required
-def collect_popup(request):
-	page_message = None
-	if request.method == 'GET':
-		collect_form = CollectForm()
-		if request.GET.has_key('url'): collect_form.initial['url'] = request.GET['url']
-		if request.GET.has_key('title'): collect_form.initial['title'] = request.GET['title']
-		if request.GET.has_key('excerpt') and len(request.GET['excerpt']) > 0:
-			collect_form.initial['excerpt'] = request.GET['excerpt']
-		elif request.GET.has_key('md'):
-			collect_form.initial['excerpt'] = request.GET['md']
-	else:
-		collect_form = CollectForm(request.POST)
-		if collect_form.is_valid():
-			log_entry = LogEntry()
-			log_entry.log = collect_form.cleaned_data['log']
-			log_entry.subject = collect_form.cleaned_data['title']
-			log_entry.content = '<blockquote>%s</blockquote><p class="collection-note">%s</p>' % (collect_form.cleaned_data['excerpt'] or '', collect_form.cleaned_data['note'] or '')
-			log_entry.publish = collect_form.cleaned_data['make_public']
-			log_entry.source_url = collect_form.cleaned_data['url']
-			log_entry.issued = datetime.now()
-			log_entry.save()
-			page_message = 'The <a href="%s">log entry</a> was created.' % reverse('trullo.publish.views.log_entry_detail', args=[], kwargs={'slug':log_entry.log.slug, 'pk':log_entry.id})
-	return render_to_response('publish/popup/collect.html', { 'collect_form':collect_form, 'page_message':page_message }, context_instance=RequestContext(request))
-
 
 @login_required
 def mobile_index(request): return render_to_response('publish/mobile/index.html', { }, context_instance=RequestContext(request))

@@ -11,7 +11,7 @@ urlpatterns = patterns('',
 	(r'^merge/$', 'publish.views.merge'),
 
 	(r'^collect/$', 'publish.views.collect'),
-	(r'^collect/popup/$', 'publish.views.collect_popup'),
+	(r'^collect-form/$', 'publish.views.collect_form'),
 
 	(r'^m/$', 'publish.views.mobile_index'),
 	(r'^m/idea/$', 'publish.views.mobile_ideas'),
