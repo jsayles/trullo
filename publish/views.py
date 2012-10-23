@@ -1,3 +1,4 @@
+import time
 import rfc822
 import tweepy
 import urllib
@@ -217,7 +218,7 @@ def log_entry_detail(request, slug, pk):
 		else:
 			logging.info('received an unvalidated form from %s: %s' % (request.META['REMOTE_ADDR'], comment_form.POST.get('author', None)))
 	form_key, form_value = generate_form_keypair()
-	return render_to_response('publish/%s/entry.html' % entry.log.template, { 'entry':entry, 'log':entry.log, 'comment_form':comment_form, 'form_key':form_key, 'form_value':form_value, 'archive_years':LogEntry.objects.filter(log=entry.log).dates("issued", "year") }, context_instance=RequestContext(request))
+	return render_to_response('publish/log_entry.html', { 'log_entry':entry, 'log':entry.log, 'comment_form':comment_form, 'form_key':form_key, 'form_value':form_value, 'archive_years':LogEntry.objects.filter(log=entry.log).dates("issued", "year") }, context_instance=RequestContext(request))
 
 def generate_form_keypair():
 	"""Used by forms which want to doublecheck that they're not robotic entries.  Returns a unique but validatable key/value pair to be used in a hidden form element."""

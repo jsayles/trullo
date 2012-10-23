@@ -16,6 +16,8 @@ STATICFILES_FINDERS = (
 	'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
+AUTH_PROFILE_MODULE = "front.UserProfile"
+
 SOUTH_AUTO_FREEZE_APP = True
 
 USE_I18N = False

@@ -1,0 +1,20 @@
+{% extends "publish/base.html" %}
+
+{% block title %}{{log_entry.subject|safe}} | {% endblock %}
+
+{% block script-extras-page %}
+<script>
+	$(document).ready(function(){
+		$('a.index-nav').addClass('selected');
+	});
+
+	schema.tastyPieSchema.on('populated', function(){
+		window.model = new schema.LogEntry({id:{{log_entry.id}}});
+		window.pageView = new publish.views.LogEntryView({
+			el:$('#pageView'), 
+			model:window.model,
+		});
+		model.fetch();
+	});
+</script>
+{% endblock %}

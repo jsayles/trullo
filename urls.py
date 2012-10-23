@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from trullo import API
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -15,8 +17,8 @@ urlpatterns = patterns('',
 	(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login'),
 	(r'^accounts/profile/$', 'django.views.generic.simple.redirect_to', {'url': '/'}),
 
+	(r'^api/', include(API.urls)),
 	(r'^publish/', include('trullo.publish.urls')),
-	(r'^api/publish/', include('trullo.publish.api')),
 	(r'^', include('trullo.front.urls')),
 )
 

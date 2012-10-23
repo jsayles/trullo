@@ -1,3 +1,6 @@
+.collection-view h1 {
+	font-size: 1.8em;
+}
 .collection-view ul {
 	list-style-type: none;
 	margin-left: 0; padding-left: 0;

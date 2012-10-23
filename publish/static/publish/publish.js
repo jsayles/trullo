@@ -1,8 +1,26 @@
 var publish = publish || {};
 publish.views = publish.views || {};
 
-publish.views.LogEntryItemView = views.AbstractItemView.extend({
+publish.views.LogEntryView = Backbone.View.extend({
 	className: 'log-entry-view',
+	initialize: function(){
+		_.bindAll(this, 'render');
+		this.model.bind('change', this.render);
+	},
+	render: function(){
+		this.$el.empty();
+		this.$el.append($.el.h1(this.model.get('subject')));
+		var content = this.model.get('content');
+		if(content){
+			var converter = new Markdown.Converter();
+			this.$el.append(converter.makeHtml(content));
+		}
+		return this;
+	}
+});
+
+publish.views.LogEntryItemView = views.AbstractItemView.extend({
+	className: 'log-entry-item-view',
 	render: function(){
 		var subject = $.el.h3();
 		this.$el.append(subject);
@@ -10,6 +28,9 @@ publish.views.LogEntryItemView = views.AbstractItemView.extend({
 		if(this.model.get('source_url', null)) subjectAnchor.setAttribute('rel', 'nofollow');
 		if(this.model.get('source_url')){
 			this.$el.append($.el.p(schema.hostNameFromURL(this.model.get('source_url'))));
+		}
+		if(this.options.parentView && this.options.parentView.options.showContent){
+			this.$el.append($.el.p(views.truncateWords(this.model.get('content'), 50)));
 		}
 		return this;
 	},

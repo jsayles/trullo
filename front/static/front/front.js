@@ -5,13 +5,13 @@ trullo.views.IndexView = Backbone.View.extend({
 	className: 'routeView',
 	initialize: function(){
 		_.bindAll(this, 'render');
-		this.logEntries = new schema.LogEntryCollection([], {limit: 10, filters:{'source_url__isnull':'True'}});
-		this.logEntriesView = new publish.views.LogEntryCollectionView({collection:this.logEntries});
+		this.logEntries = new schema.LogEntryCollection([], {limit: 10, filters:{'source_url__isnull':true, 'publish':true, 'log__public':true}});
+		this.logEntriesView = new publish.views.LogEntryCollectionView({showContent: true, title: 'Writin\'', collection:this.logEntries});
 		this.logEntriesView.$el.addClass('span6');
 		this.logEntries.fetch();
 
 		this.streamEntries = new schema.LogEntryCollection([], {limit: 10, filters:{'source_url__isnull':'False'}});
-		this.streamView = new publish.views.LogEntryCollectionView({collection:this.streamEntries});
+		this.streamView = new publish.views.LogEntryCollectionView({title: 'Linkin\'', collection:this.streamEntries});
 		this.streamView.$el.addClass('span6');
 		this.streamEntries.fetch();
 	},
@@ -26,12 +26,20 @@ trullo.views.IndexView = Backbone.View.extend({
 });
 
 trullo.views.AboutView = Backbone.View.extend({
-	className: 'routeView',
+	class: 'routeView',
 	initialize: function(){
 		_.bindAll(this, 'render');
+		this.$el.addClass('aboutView');
+		this.collection = new schema.UserCollection({filter:{'is_staff':true}});
+		this.collection.bind('reset', this.render);
+		this.collection.fetch();
 	},
 	render: function(){
-		this.$el.append($.el.h1('About'));
+		this.$el.empty();
+		if(this.collection.length == 0) return this;
+		user = this.collection.at(0);
+		profile = user.get('profile');
+		if(profile) this.$el.html(profile.about);
 		return this;
 	},
 });

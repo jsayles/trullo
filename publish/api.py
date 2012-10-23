@@ -16,7 +16,7 @@ from django.http import HttpResponse, Http404, HttpResponseServerError, HttpResp
 
 from models import Project, Idea, Publication, LogEntry
 
-V1_API = Api(api_name='v0.1')
+from trullo import API
 
 class LogEntryResource(ModelResource):
 	class Meta:
@@ -26,19 +26,21 @@ class LogEntryResource(ModelResource):
 		include_absolute_url = True
 		paginator_class = Paginator
 		filtering = {
-			"source_url": ('isnull',),
+			'source_url': ('isnull',),
+			'publish':('exact',),
+			'log__public':('exact',),
 		}
 	def get_object_list(self, request):
 		objects = super(LogEntryResource, self).get_object_list(request)
 		if request.user.is_authenticated(): return objects
 		return objects.filter(publish=True, log__public=True)
-V1_API.register(LogEntryResource())
+API.register(LogEntryResource())
 
 class PublicationResource(ModelResource):
 	class Meta:
 		queryset = Publication.objects.all()
 		allowed_methods = ['get']
-V1_API.register(PublicationResource())
+API.register(PublicationResource())
 
 class ProjectResource(ModelResource):
 	class Meta:
@@ -54,7 +56,7 @@ class ProjectResource(ModelResource):
 		return [
 			url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
 		]
-V1_API.register(ProjectResource())
+API.register(ProjectResource())
 
 class IdeaResource(ModelResource):
 	class Meta:
@@ -65,9 +67,4 @@ class IdeaResource(ModelResource):
 		items = super(IdeaResource, self).get_object_list(request)
 		if request.user.is_authenticated(): return items
 		return items.filter(public=True)
-V1_API.register(IdeaResource())
-
-urlpatterns = patterns('',
-	(r'^', include(V1_API.urls)),
-)
-
+API.register(IdeaResource())

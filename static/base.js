@@ -56,7 +56,7 @@ schema.AbstractTastyPieCollection = Backbone.Collection.extend({
 });
 
 schema.TastyPieSchema = Backbone.Model.extend({
-	url: '/api/publish/v0.1/',
+	url: '/api/v0.1/',
 	populate: function(){
 		for(var name in this.attributes){
 			var resourceClassName = schema.javascriptifyResourceName(name);
@@ -96,6 +96,18 @@ $(document).ready(function(){
 
 var views = views || {};
 
+views.truncateWords = function(text, length){
+	// Returns as many as `length` words from `text`
+	if(!text) return text;
+	if(!length || length === 0) return '';
+
+	var textArray = text.split(/\s+/);
+	if(length < textArray.length) {
+		return textArray.slice(0, length).join(' ') + ' ...';
+	}
+	return text;
+}
+
 views.AbstractCollectionView = Backbone.View.extend({
 	tagName: 'section',
 	initialize: function(){
@@ -126,7 +138,7 @@ views.AbstractCollectionView = Backbone.View.extend({
 				if(val == null || val == '') return;
 			}
 		}
-		this.itemViews[this.itemViews.length] = new this.itemView({model:item});
+		this.itemViews[this.itemViews.length] = new this.itemView({model:item, parentView:this});
 		this.$el.find('ul').append(this.itemViews[this.itemViews.length - 1].render().el);
 	},
 	remove: function(idea){
