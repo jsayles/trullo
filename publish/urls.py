@@ -6,7 +6,7 @@ urlpatterns = patterns('',
 	(r'^idea/$', 'publish.views.ideas'),
 	(r'^publication/$', 'publish.views.publications'),
 	(r'^project/$', 'publish.views.projects'),
-	(r'^image/(?P<id>[\d]+)/$', 'publish.views.image_detail'),
+	(r'^image/(?P<id>[\d]+)/$', 'publish.views.image'),
 
 	(r'^merge/$', 'publish.views.merge'),
 
@@ -17,11 +17,11 @@ urlpatterns = patterns('',
 	(r'^m/idea/$', 'publish.views.mobile_ideas'),
 	(r'^m/idea/(?P<id>\d+)/$', 'publish.views.mobile_idea'),
 
-	(r'^(?P<slug>[^/]+)/$', 'publish.views.stream_detail'),
-	(r'^(?P<slug>[^/]+)/archive/$', 'publish.views.stream_archive'),
-	(r'^(?P<slug>[^/]+)/archive/(?P<year>[\d]+)/$', 'publish.views.stream_year_archive'),
-	(r'^(?P<slug>[^/]+)/feed/$', 'publish.views.stream_feed'),
-	(r'^(?P<slug>[^/]+)/(?P<pk>[\d]+)/$', 'publish.views.log_entry_detail'),
+	(r'^(?P<slug>[^/]+)/$', 'publish.views.log'),
+	(r'^(?P<slug>[^/]+)/archive/$', 'publish.views.log_archive'),
+	(r'^(?P<slug>[^/]+)/archive/(?P<year>[\d]+)/$', 'publish.views.log_year_archive'),
+	(r'^(?P<slug>[^/]+)/feed/$', 'publish.views.log_feed'),
+	(r'^(?P<slug>[^/]+)/(?P<pk>[\d]+)/$', 'publish.views.log_entry'),
 )
 
 # Copyright 2012 Trevor F. Smith (http://trevor.smith.name/) 

@@ -11,7 +11,7 @@
 	schema.tastyPieSchema.on('populated', function(){
 		window.model = new schema.LogEntry({id:{{log_entry.id}}});
 		window.pageView = new publish.views.LogEntryView({
-			el:$('#pageView'), 
+			el:$('#page-view'), 
 			model:window.model,
 		});
 		model.fetch();

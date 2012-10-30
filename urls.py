@@ -13,13 +13,13 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
 
-	(r'^accounts/login/$', 'django.contrib.auth.views.login'),
+	(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name':'admin/login.html'}),
 	(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login'),
 	(r'^accounts/profile/$', 'django.views.generic.simple.redirect_to', {'url': '/'}),
 
 	(r'^api/', include(API.urls)),
-	(r'^publish/', include('trullo.publish.urls')),
-	(r'^', include('trullo.front.urls')),
+	(r'^publish/', include('publish.urls')),
+	(r'^', include('front.urls')),
 )
 
 if settings.DEBUG:

@@ -60,7 +60,7 @@ def collect_form(request):
 			log_entry.source_url = collect_form.cleaned_data['url']
 			log_entry.issued = datetime.now()
 			log_entry.save()
-			page_message = 'The <a href="%s">log entry</a> was created.' % reverse('publish.views.log_entry_detail', args=[], kwargs={'slug':log_entry.log.slug, 'pk':log_entry.id})
+			page_message = 'The <a href="%s">log entry</a> was created.' % reverse('publish.views.log_entry', args=[], kwargs={'slug':log_entry.log.slug, 'pk':log_entry.id})
 	return render_to_response('publish/collect_form.html', { 'collect_form':collect_form, 'page_message':page_message }, context_instance=RequestContext(request))
 
 def update_twitter(request):
@@ -140,30 +140,30 @@ def projects(request):
 def links(request):
 	return render_to_response('publish/links.html', { 'links':Link.objects.all() }, context_instance=RequestContext(request))
 
-def image_detail(request, id):
-	return render_to_response('publish/image_detail.html', {}, context_instance=RequestContext(request))
+def image(request, id):
+	return render_to_response('publish/image.html', {}, context_instance=RequestContext(request))
 	
-def stream_detail(request, slug):
+def log(request, slug):
 	log = get_object_or_404(Log, slug=slug)
 	if not request.user.is_staff and not log.public:
 		return HttpResponseRedirect('/accounts/login/?next=%s' % request.path)
-	return render_to_response('publish/%s/splash.html' % log.template, { 'log':log, 'archive_years':LogEntry.objects.filter(log=log).dates("issued", "year") }, context_instance=RequestContext(request))
+	return render_to_response('publish/log.html', { 'log':log, 'archive_years':LogEntry.objects.filter(log=log).dates("issued", "year") }, context_instance=RequestContext(request))
 
-def stream_archive(request, slug):
-	return stream_year_archive(request, slug, datetime.now().year)
+def log_archive(request, slug):
+	return log_year_archive(request, slug, datetime.now().year)
 
-def stream_year_archive(request, slug, year):
+def log_year_archive(request, slug, year):
 	log = get_object_or_404(Log, slug=slug)
 	if not request.user.is_staff and not log.public:
 		return HttpResponseRedirect('/accounts/login/?next=%s' % request.path)
 	return render_to_response('publish/%s/archive.html' % log.template, { 'log':log, 'entries':LogEntry.objects.filter(log=log, issued__year=year),'archive_years':LogEntry.objects.filter(log=log).dates("issued", "year") }, context_instance=RequestContext(request))
 
-def stream_feed(request, slug):
+def log_feed(request, slug):
 	log = get_object_or_404(Log, slug=slug)
 	if not request.user.is_staff and not log.public:
 		return HttpResponseRedirect('/accounts/login/?next=%s' % request.path)
 
-	cache_key = "trullo.feed.stream.%s" % slug
+	cache_key = "trullo.feed.log.%s" % slug
 	cached_feed = cache.get(cache_key)
 	if cached_feed: return HttpResponse(cached_feed, mimetype='application/rss+xml')
 	
@@ -196,7 +196,7 @@ def add_story_to_feed(story, feed):
 	link = "http://" + site.domain + story.get_absolute_url()
 	feed.add_item(title=strip_tags(story.headline), link=link, description=story.body, author_name=author_name, pubdate=story.start_date)
 
-def log_entry_detail(request, slug, pk):
+def log_entry(request, slug, pk):
 	entry = get_object_or_404(LogEntry, log__slug=slug, pk=pk)
 	if not request.user.is_staff:
 		if not entry.publish: raise Http404

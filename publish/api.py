@@ -1,3 +1,4 @@
+from tastypie import fields
 from tastypie.api import Api
 from tastypie.paginator import Paginator
 from datetime import datetime, timedelta, date
@@ -14,11 +15,21 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404, HttpResponseServerError, HttpResponseRedirect, HttpResponsePermanentRedirect
 
-from models import Project, Idea, Publication, LogEntry
+from models import Project, Idea, Publication, LogEntry, Log
 
 from trullo import API
 
+class LogResource(ModelResource):
+	class Meta:
+		queryset = Log.objects.all()
+		filtering = {
+			'slug': ['exact'],
+			'public': ['exact'],
+		}
+API.register(LogResource())
+
 class LogEntryResource(ModelResource):
+	log = fields.ForeignKey(LogResource, 'log')
 	class Meta:
 		queryset = LogEntry.objects.all()
 		resource_name = 'log-entry'
@@ -26,9 +37,9 @@ class LogEntryResource(ModelResource):
 		include_absolute_url = True
 		paginator_class = Paginator
 		filtering = {
-			'source_url': ('isnull',),
-			'publish':('exact',),
-			'log__public':('exact',),
+			'log': ALL_WITH_RELATIONS,
+			'source_url': ['isnull'],
+			'publish':['exact'],
 		}
 	def get_object_list(self, request):
 		objects = super(LogEntryResource, self).get_object_list(request)

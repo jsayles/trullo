@@ -26,7 +26,7 @@ from django.utils.html import strip_tags,  linebreaks, urlize
 from django.contrib.markup.templatetags.markup import markdown
 from django.utils.encoding import force_unicode, smart_unicode, smart_str
 
-#from trullo.publish.templatetags.texttags import sanitize_html
+#from publish.templatetags.texttags import sanitize_html
 
 class ThumbnailedModel(models.Model):
 	"""An abstract base class for models with an ImageField named "image" """
@@ -53,7 +53,7 @@ class Photo(ThumbnailedModel):
 	created = models.DateTimeField(auto_now_add=True)
 	@models.permalink
 	def get_absolute_url(self):
-		return ('trullo.publish.views.photo_detail', (), { 'id':self.id })
+		return ('publish.views.photo', (), { 'id':self.id })
 	class Meta:
 		ordering = ['-created']
 	def __unicode__(self):
@@ -103,10 +103,11 @@ class Project(models.Model):
 	portfolio = models.BooleanField(default=False, blank=False, null=False)
 	photos = models.ManyToManyField(Photo, blank=True, null=True)
 	url = models.URLField(null=True, blank=True)
+	logo = models.ForeignKey(Photo, blank=True, null=True, related_name='logos')
 
 	def __unicode__(self): return self.title
 	class Meta:
-		ordering = ['-started']
+		ordering = ['-started', '-ended']
 
 class Comment(models.Model):
 	author = models.CharField(max_length=512, blank=False, null=False)
@@ -136,10 +137,10 @@ class Log(models.Model):
 		return LogEntry.objects.filter(log=self, publish=True)
 	@models.permalink
 	def get_feed_url(self):
-		return ('trullo.publish.views.stream_feed', (), { 'slug':self.slug })
+		return ('publish.views.log_feed', (), { 'slug':self.slug })
 	@models.permalink
 	def get_absolute_url(self):
-		return ('trullo.publish.views.stream_detail', (), { 'slug':self.slug })
+		return ('publish.views.log', (), { 'slug':self.slug })
 	def __unicode__(self):
 		return self.title
 
@@ -178,7 +179,7 @@ class LogEntry(models.Model):
 		return 'No Subject'
 	def get_absolute_url(self):
 		if self.source_url: return str(self.source_url)
-		return reverse('publish.views.log_entry_detail', args=[], kwargs={ 'slug':self.log.slug, 'pk':self.id })
+		return reverse('publish.views.log_entry', args=[], kwargs={ 'slug':self.log.slug, 'pk':self.id })
 	class Meta:
 		verbose_name_plural = "log entries"
 		ordering = ['-issued']
@@ -258,7 +259,7 @@ class ImageEntry(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	@models.permalink
 	def get_absolute_url(self):
-		return (views.image_detail, (), { 'id':self.id })
+		return (views.image, (), { 'id':self.id })
 	class Meta:
 		ordering = ['-created']
 	def __unicode__(self):

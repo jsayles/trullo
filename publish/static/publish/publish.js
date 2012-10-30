@@ -1,6 +1,30 @@
 var publish = publish || {};
 publish.views = publish.views || {};
 
+publish.views.LogView = Backbone.View.extend({
+	className: 'log-view row-fluid',
+	initialize: function(){
+		_.bindAll(this, 'render', 'jobChanged');
+		this.logEntriesView = null;
+		this.model.bind('change', this.jobChanged);
+	},
+	jobChanged: function(){
+		this.logEntries = new schema.LogEntryCollection([], {limit: 20, filters:{'log__slug':this.model.get('slug')}});
+		this.logEntriesView = new publish.views.LogEntryCollectionView({showContent: true, title: this.model.get('title'), collection:this.logEntries});
+		this.logEntriesView.$el.addClass('span9');
+		this.render();
+		this.logEntries.fetch();
+	},
+	render: function(){
+		this.$el.empty();
+		var row1 = $.el.div({class:'row-fluid'});
+		this.$el.append(row1);
+		if(this.logEntriesView){
+			row1.append(this.logEntriesView.render().el);
+		}
+	},
+});
+
 publish.views.LogEntryView = Backbone.View.extend({
 	className: 'log-entry-view',
 	initialize: function(){
@@ -30,7 +54,10 @@ publish.views.LogEntryItemView = views.AbstractItemView.extend({
 			this.$el.append($.el.p(schema.hostNameFromURL(this.model.get('source_url'))));
 		}
 		if(this.options.parentView && this.options.parentView.options.showContent){
-			this.$el.append($.el.p(views.truncateWords(this.model.get('content'), 50)));
+			var content = views.truncateWords(this.model.get('content'), 50);
+			var converter = new Markdown.Converter();
+			var convertedContent = converter.makeHtml(content);
+			this.$el.append(convertedContent);
 		}
 		return this;
 	},
