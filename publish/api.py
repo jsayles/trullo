@@ -15,7 +15,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404, HttpResponseServerError, HttpResponseRedirect, HttpResponsePermanentRedirect
 
-from models import Project, Idea, Publication, LogEntry, Log
+from models import Project, Idea, Publication, LogEntry, Log, Idea
 
 from trullo import API
 
@@ -26,6 +26,10 @@ class LogResource(ModelResource):
 			'slug': ['exact'],
 			'public': ['exact'],
 		}
+	def get_object_list(self, request):
+		objects = super(LogResource, self).get_object_list(request)
+		if request.user.is_authenticated(): return objects
+		return objects.filter(public=True)
 API.register(LogResource())
 
 class LogEntryResource(ModelResource):
