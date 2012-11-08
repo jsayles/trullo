@@ -1,0 +1,19 @@
+{% extends "publish/base.html" %}
+
+{% block title %}Ideas | {% endblock %}
+
+{% block script-extras-page %}
+<script>
+	$(document).ready(function(){
+		$('a.index-nav').addClass('selected');
+	});
+	var ideas = null;
+	var pageView = null;
+	schema.tastyPieSchema.on('populated', function(){
+		ideas = new schema.IdeaCollection();
+		pageView = new publish.views.IdeasView({el:$('#page-view'), collection:ideas});
+		pageView.render();
+		ideas.fetch();
+	});
+</script>
+{% endblock %}

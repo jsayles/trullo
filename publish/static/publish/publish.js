@@ -1,6 +1,22 @@
 var publish = publish || {};
 publish.views = publish.views || {};
 
+publish.views.IdeasView = Backbone.View.extend({
+
+	className: 'idea-view row-fluid',
+	initialize: function(){
+		_.bindAll(this, 'render');
+		this.collectionView = new publish.views.IdeaCollectionView({showContent: true, title: 'Ideas', collection:this.collection});
+		this.collectionView.$el.addClass('span9');
+	},
+	render: function(){
+		this.$el.empty();
+		var row1 = $.el.div({class:'row-fluid'});
+		this.$el.append(row1);
+		row1.append(this.collectionView.el);
+	},
+});
+
 publish.views.LogView = Backbone.View.extend({
 	className: 'log-view row-fluid',
 	initialize: function(){
@@ -71,8 +87,10 @@ publish.views.LogEntryCollectionView = views.AbstractCollectionView.extend({
 publish.views.IdeaItemView = views.AbstractItemView.extend({
 	className: 'idea-item-view',
 	render: function(){
-		this.$el.append($('<h3 />').html(this.model.get('title')));
-		this.$el.append($('<p />').html(this.model.get('description')));
+		this.$el.empty();
+		this.$el.append($('<h3>').html(this.model.get('title')));
+		var converter = new Markdown.Converter();
+		this.$el.append($('<p>').html(converter.makeHtml(this.model.get('description'))));
 		return this;
 	},
 });

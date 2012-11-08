@@ -114,6 +114,7 @@ views.AbstractCollectionView = Backbone.View.extend({
 		_.bindAll(this, 'render', 'add', 'remove', 'reset');
 		this.$el.addClass('collection-view');
 		this.itemViews = [];
+		this.itemList = $.el.ul();
 
 		this.collection.on('add', this.add);
 		this.collection.on('remove', this.remove);
@@ -139,15 +140,16 @@ views.AbstractCollectionView = Backbone.View.extend({
 			}
 		}
 		this.itemViews[this.itemViews.length] = new this.itemView({model:item, parentView:this});
-		this.$el.find('ul').append(this.itemViews[this.itemViews.length - 1].render().el);
+		this.itemList.append(this.itemViews[this.itemViews.length - 1].render().el);
 	},
 	remove: function(idea){
 		console.log('remove', arguments);
 	},
 	render: function(){
 		this.$el.empty();
+		$(this.itemList).empty()
 		if(this.options.title) this.$el.append($.el.h1(this.options.title));
-		this.$el.append($.el.ul());
+		this.$el.append(this.itemList);
 		return this;
 	},
 })
