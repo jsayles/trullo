@@ -84,6 +84,7 @@ class Idea(models.Model):
 
 	def save(self, *args, **kwargs):
 		"""When saving the content, render via markdown and save to self.rendered"""
+		print 'rendering'
 		self.rendered = markdown(urlize(self.description))
 		super(Idea, self).save(*args, **kwargs)
 

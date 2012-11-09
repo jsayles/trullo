@@ -2,7 +2,9 @@ from tastypie import fields
 from tastypie.api import Api
 from tastypie.paginator import Paginator
 from datetime import datetime, timedelta, date
-from tastypie.authorization import DjangoAuthorization
+from tastypie.validation import FormValidation
+from tastypie.authentication import Authentication, SessionAuthentication
+from tastypie.authorization import DjangoAuthorization, Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
 from django.conf import settings
@@ -15,7 +17,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404, HttpResponseServerError, HttpResponseRedirect, HttpResponsePermanentRedirect
 
-from models import Project, Idea, Publication, LogEntry, Log, Idea
+from publish.forms import IdeaForm
+from publish.models import Project, Idea, Publication, LogEntry, Log, Idea
 
 from trullo import API
 
@@ -76,7 +79,10 @@ API.register(ProjectResource())
 class IdeaResource(ModelResource):
 	class Meta:
 		queryset = Idea.objects.all()
-		allowed_methods = ['get']
+		allowed_methods = ['get', 'post']
+		validation = FormValidation(form_class=IdeaForm)
+		authentication = SessionAuthentication()
+		authorization = DjangoAuthorization()
 
 	def get_object_list(self, request):
 		items = super(IdeaResource, self).get_object_list(request)

@@ -19,12 +19,38 @@ schema.hostNameFromURL = function(url){
 	return splitURL[2];
 }
 
+schema.getCookie = function(name) {
+	var cookieValue = null;
+	if (document.cookie && document.cookie != '') {
+		var cookies = document.cookie.split(';');
+		for (var i = 0; i < cookies.length; i++) {
+			var cookie = jQuery.trim(cookies[i]);
+			// Does this cookie string begin with the name we want?
+			if (cookie.substring(0, name.length + 1) == (name + '=')) {
+				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+				break;
+			}
+		}
+	}
+	return cookieValue;
+}
+
+schema.apiSync = function(method, model, options){
+	var new_options =  _.extend({
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader("X-CSRFToken", schema.getCookie('csrftoken'));
+		}
+	}, options);
+	Backbone.sync(method, model, new_options);
+}
+
 schema.AbstractTastyPieModel = Backbone.Model.extend({
 	url: function(){
 		if(typeof this.get('id') == 'undefined') return this.list_endpoint;
 		return this.list_endpoint + this.get('id');
 	}, 
 });
+schema.AbstractTastyPieModel.prototype.sync = schema.apiSync;
 
 schema.AbstractTastyPieCollection = Backbone.Collection.extend({
 	initialize: function(models, options){
@@ -54,6 +80,7 @@ schema.AbstractTastyPieCollection = Backbone.Collection.extend({
 		return result;
 	}, 
 });
+schema.AbstractTastyPieCollection.prototype.sync = schema.apiSync;
 
 schema.TastyPieSchema = Backbone.Model.extend({
 	url: '/api/v0.1/',
@@ -75,11 +102,11 @@ schema.TastyPieSchema = Backbone.Model.extend({
 schema.tastyPieSchema = new schema.TastyPieSchema();
 
 schema.parseJsonDate = function(jsonDate){
-    var dateString = jsonDate.split('T')[0];
-    var dateArray = dateString.split('-');
-    var date = new Date(dateArray[1] + ' ' + dateArray[2] + ' ' + dateArray[0]);
-    var timeArray = jsonDate.split('T')[1].split(':');
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10));
+	var dateString = jsonDate.split('T')[0];
+	var dateArray = dateString.split('-');
+	var date = new Date(dateArray[1] + ' ' + dateArray[2] + ' ' + dateArray[0]);
+	var timeArray = jsonDate.split('T')[1].split(':');
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate(), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10));
 }
 
 schema.formatDate = function(jsDate){

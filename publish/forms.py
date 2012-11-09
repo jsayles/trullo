@@ -2,7 +2,7 @@ from django import forms
 from django.utils.html import strip_tags
 from django.contrib.auth.models import User
 
-from models import *
+from models import Log, Link, Comment, Idea
 
 class CollectForm(forms.Form):
    log = forms.ModelChoiceField(queryset=Log.objects.all(), required=True)
