@@ -11,7 +11,7 @@
 	var pageView = null;
 	schema.tastyPieSchema.on('populated', function(){
 		ideas = new schema.IdeaCollection();
-		pageView = new publish.views.IdeasView({el:$('#page-view'), collection:ideas});
+		pageView = new publish.views.IdeasView({el:$('#page-view'), collection:ideas, hideForm: {% if request.user.is_authenticated %}false{% else %}true{% endif %}  });
 		pageView.render();
 		ideas.fetch();
 	});

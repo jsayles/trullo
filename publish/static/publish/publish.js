@@ -2,18 +2,29 @@ var publish = publish || {};
 publish.views = publish.views || {};
 
 publish.views.IdeasView = Backbone.View.extend({
-
 	className: 'idea-view row-fluid',
 	initialize: function(){
-		_.bindAll(this, 'render');
+		_.bindAll(this, 'render', 'handleFormSaved');
+
+		this.ideaForm = new views.TastyPieModelForm({model: new schema.Idea(), showFirst:['title', 'description', 'public'], 'savedCallback':this.handleFormSaved});
 		this.collectionView = new publish.views.IdeaCollectionView({showContent: true, title: 'Ideas', collection:this.collection});
 		this.collectionView.$el.addClass('span9');
 	},
+	handleFormSaved: function(model){
+		document.location.reload();
+	},
 	render: function(){
 		this.$el.empty();
-		var row1 = $.el.div({class:'row-fluid'});
-		this.$el.append(row1);
-		row1.append(this.collectionView.el);
+
+		if(!this.options.hideForm){
+			var row1 = $.el.div({class:'row-fluid'});
+			this.$el.append(row1);
+			row1.append(this.ideaForm.render().el);
+		}
+
+		var row2 = $.el.div({class:'row-fluid'});
+		this.$el.append(row2);
+		row2.append(this.collectionView.el);
 	},
 });
 

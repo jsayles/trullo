@@ -80,11 +80,10 @@ class Idea(models.Model):
 	description = models.TextField(blank=True, null=True)
 	public = models.BooleanField(default=False, blank=False, null=False)
 	created = models.DateTimeField(null=False, blank=False, default=datetime.now)
-	rendered = models.TextField(blank=True, null=True)
+	rendered = models.TextField(blank=True, null=True, editable=False)
 
 	def save(self, *args, **kwargs):
 		"""When saving the content, render via markdown and save to self.rendered"""
-		print 'rendering'
 		self.rendered = markdown(urlize(self.description))
 		super(Idea, self).save(*args, **kwargs)
 

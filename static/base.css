@@ -28,6 +28,19 @@ body {
 	color: #FF7900;
 }
 
+form.model-form { max-width: 500px; }
+form.model-form button[type=submit] {
+	display: block;
+	float: right;
+}
+form.model-form input[type=text] { width: 100%; }
+label.model-form-label { margin-bottom: 0em; }
+label.model-form-boolean-label:before { content: "\a"; white-space: pre; }
+label.model-form-boolean-label {
+	display: inline;
+	margin-right: 0.5em;
+}
+
 @media (max-width: 940px) {
   body {
   }

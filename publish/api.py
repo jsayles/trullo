@@ -77,11 +77,14 @@ class ProjectResource(ModelResource):
 API.register(ProjectResource())
 
 class IdeaResource(ModelResource):
+	created = fields.DateTimeField(readonly=True)
+	rendered = fields.CharField(readonly=True)
+
 	class Meta:
 		queryset = Idea.objects.all()
 		allowed_methods = ['get', 'post']
 		validation = FormValidation(form_class=IdeaForm)
-		authentication = SessionAuthentication()
+		#authentication = SessionAuthentication()
 		authorization = DjangoAuthorization()
 
 	def get_object_list(self, request):

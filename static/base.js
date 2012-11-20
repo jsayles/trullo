@@ -48,7 +48,11 @@ schema.AbstractTastyPieModel = Backbone.Model.extend({
 	url: function(){
 		if(typeof this.get('id') == 'undefined') return this.list_endpoint;
 		return this.list_endpoint + this.get('id');
-	}, 
+	},
+
+	schemaUrl: function(){
+		return this.list_endpoint + 'schema';
+	},
 });
 schema.AbstractTastyPieModel.prototype.sync = schema.apiSync;
 
@@ -101,6 +105,13 @@ schema.TastyPieSchema = Backbone.Model.extend({
 
 schema.tastyPieSchema = new schema.TastyPieSchema();
 
+$(document).ready(function(){
+	schema.tastyPieSchema.fetch({success: function(){
+		schema.tastyPieSchema.populate();
+	}});
+});
+
+
 schema.parseJsonDate = function(jsonDate){
 	var dateString = jsonDate.split('T')[0];
 	var dateArray = dateString.split('-');
@@ -114,12 +125,6 @@ schema.formatDate = function(jsDate){
 }
 
 schema.MONTH_STRINGS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-$(document).ready(function(){
-	schema.tastyPieSchema.fetch({success: function(){
-		schema.tastyPieSchema.populate();
-	}});
-});
 
 var views = views || {};
 
@@ -194,6 +199,158 @@ views.AbstractItemView = Backbone.View.extend({
 	},
 });
 
+views.TastyPieModelForm = Backbone.View.extend({
+	/*
+	This view displays a form for a given Backbone.Model.
+	It relies on the metadata provided at the model's schemaUrl method.
+
+	Options:
+		model: the model of interest
+		showFirst: array of field name strings in the order which they should be displayed
+	*/
+	tagName: 'form',
+	className: 'model-form',
+	initialize: function(){
+		_.bindAll(this, 'render', 'handleChange', 'handleInput', 'handleSubmit', 'validate');
+		this.$el.attr('action', '.');
+		this.$el.attr('method', 'post');
+		this.fieldOrder = null;
+		this.schemaInitialized = false;
+		this.isValid = false;
+
+		if(this.options.modelSchema){
+			this.modelSchema = this.options.modelSchema;
+		} else {
+			var model = Backbone.Model.extend({
+				url: this.model.schemaUrl(),
+			});
+			this.modelSchema = new model();
+			this.modelSchema.fetch();
+		}
+		this.modelSchema.on('change', this.handleChange);
+		this.$el.submit(this.handleSubmit);
+	},
+
+	handleChange: function(){
+		if(this.schemaInitialized) return;
+		this.schemaInitialized = true;
+
+		var fields = this.modelSchema.get('fields')
+		this.fieldOrder = [];
+		// First, add any field names in showFirst
+		if(this.options.showFirst){
+			for(var i=0; i < this.options.showFirst.length; i++){
+				if(fields[this.options.showFirst[i]]) this.fieldOrder[this.fieldOrder.length] = this.options.showFirst[i];
+			}
+		} 
+		// Then, add the rest of the field names
+		for(var name in fields){
+			if($.inArray(name, this.fieldOrder) != -1) continue; // Already added via showFirst
+			this.fieldOrder[this.fieldOrder.length] = name;
+		}
+		this.render();
+		this.validate();
+	},
+
+	validate: function(){
+		var validated = true;
+		var inputs = this.$el.find('input');
+		for(var i=0; i < inputs.length; i++){
+			var fieldInfo = $.data(inputs[i], 'backbone-field');
+			switch(fieldInfo['field']['type']){
+				case 'string':
+				case 'integer':
+					if(this.model.get(fieldInfo['name'])){
+						$(inputs[i]).removeClass('invalid-input');
+					} else {
+						$(inputs[i]).addClass('invalid-input');
+						validated = false;
+					}
+					break;
+				case 'boolean':
+					break;
+				default:
+					// pass
+			}
+		}
+		this.isValid = validated;
+		this.$el.find('button[type=submit]').attr('disabled', this.isValid ? null : 'disabled');
+	},
+
+	handleInput: function(event){
+		var fieldInfo = $.data(event.target, 'backbone-field');
+		var name = fieldInfo['name'];
+		switch(fieldInfo['field']['type']){
+			case 'string':
+			case 'integer':
+				this.model.set(name, $(event.target).val());
+				break;
+			case 'boolean':
+				ths.model.set(name, $(event.target).attr('checked') == 'checked');
+				break;
+			default:
+				console.log("Unhandled field info type", fieldInfo['field']['type']);
+		}
+		this.validate();
+	},
+
+	handleSubmit: function(){
+		this.model.save(null, {
+			success: _.bind(function(model, xhr, options){
+				this.render();
+				if(this.options.savedCallback) this.options.savedCallback(this.model);
+			}, this),
+			error: _.bind(function(model, xhr, options){
+				this.render();
+			}, this)
+		});
+		return false;
+	},
+
+	render: function(){
+		this.$el.empty()
+		if(this.fieldOrder == null) return this;
+
+		var fields = this.modelSchema.get('fields');
+		for(var i in this.fieldOrder){
+			var name = this.fieldOrder[i]
+			var field = fields[name];
+
+			if(name == 'id') continue; 
+			if(field['readonly']) continue;
+
+			var label = $.el.label({class:'model-form-label model-form-' + field['type'] + '-label'}, name);
+			this.$el.append(label);
+
+			var input = null;
+			switch(field['type']){
+				case 'integer':
+					var input = $.el.input({type:'text', class:'model-form-integer-input', value: this.model.get(name)});
+					$(input).keyup(this.handleInput);
+					this.$el.append(input);
+					break;
+				case 'string':
+					var input = $.el.input({type:'text', class:'model-form-string-input', value: this.model.get(name)});
+					$(input).keyup(this.handleInput);
+					this.$el.append(input);
+					break;
+				case 'boolean':
+					var input = $.el.input({type:'checkbox', class:'model-form-boolean-input'});
+					this.$el.append(input);
+					if(field['default'] == true) $(input).attr('checked', 'checked');
+					$(input).change(this.handleInput);
+					break;
+			}
+			if(input){
+				$.data(input, 'backbone-field', {'model':this.model, 'name':name, 'field':field});
+			}
+		}
+
+		this.submitButton = $.el.button({type:'submit'}, this.model.id ? 'Update' : 'Create');
+		this.$el.append(this.submitButton);
+		return this;
+	},
+})
 
 /*
 Copyright 2012 Trevor F. Smith (http://trevor.smith.name/) 
