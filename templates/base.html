@@ -5,6 +5,7 @@
 		<title>{% block title %}{% endblock %}{{ site.name }}</title>
 		<meta name="description" content="{% block meta-description %}{% endblock %}">
 		<meta name="author" content="{% block meta-author %}{% endblock %}">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />
 
 		<!--
 		<link rel="shortcut icon" href="{{STATIC_URL}}favicon.png" />
@@ -24,20 +25,21 @@
 
 	{% block navbar %}
 		<div id="top-bar" class="container-fluid">
-			<nav>
-				<a href="{% url front.views.index %}" class="index-nav">News</a>
-				<a href="{% url publish.views.projects %}" class="projects-nav">Projects</a>
-				<a href="{% url publish.views.publications %}" class="publications-nav">Publications</a>
-				<a href="{% url front.views.about %}" class="about-nav">About</a>
-				<a href="{% url front.views.contact %}" class="contact-nav">Contact</a>
-				{% if request.user.is_staff %}
-					<a href="{% url admin:index %}">Admin</a>
-				{% endif %}
-			</nav>
-			<a id="brand" href="{% url front.views.index %}">{{ site.name }}</a>
+			<div class="row-fluid">
+				<a class="span4" id="brand" href="{% url front.views.index %}">{{ site.name }}</a>
+				<nav class="span8">
+					<a href="{% url front.views.index %}" class="index-nav">News</a>
+					<a href="{% url publish.views.projects %}" class="projects-nav">Projects</a>
+					<a href="{% url publish.views.publications %}" class="publications-nav">Publications</a>
+					<a href="{% url front.views.about %}" class="about-nav">About</a>
+					<a href="{% url front.views.contact %}" class="contact-nav">Contact</a>
+					{% if request.user.is_staff %}
+						<a href="{% url admin:index %}">Admin</a>
+					{% endif %}
+				</nav>
+			</div>
 		</div>
 	{% endblock %}
-
 	<div id="page-view" class="container-fluid">{% block page-view %}{% endblock %}</div>
 
 	<script src="{{STATIC_URL}}jquery.1.7.2.js"></script>
