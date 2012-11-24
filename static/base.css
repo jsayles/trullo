@@ -38,6 +38,11 @@ label.model-form-boolean-label {
 	margin-right: 0.5em;
 }
 
+.inline-block {
+	display: inline-block;
+	vertical-align: top;
+}
+
 @media (min-width: 980px) {
 	#top-bar nav {
 		text-align: right;
