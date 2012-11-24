@@ -39,18 +39,34 @@ trullo.views.AboutView = Backbone.View.extend({
 		if(this.collection.length == 0) return this;
 		user = this.collection.at(0);
 		profile = user.get('profile');
-		if(profile) this.$el.html(profile.about);
+
+		if(profile){
+			var converter = new Markdown.Converter();
+			this.$el.html(converter.makeHtml(profile.about));
+		}
 		return this;
 	},
 });
 
 trullo.views.ContactView = Backbone.View.extend({
-	className: 'routeView',
+	class: 'routeView',
 	initialize: function(){
 		_.bindAll(this, 'render');
+		this.$el.addClass('contactView');
+		this.collection = new schema.UserCollection({filter:{'is_staff':true}});
+		this.collection.bind('reset', this.render);
+		this.collection.fetch();
 	},
 	render: function(){
-		this.$el.append($.el.h1('Contact'));
+		this.$el.empty();
+		if(this.collection.length == 0) return this;
+		user = this.collection.at(0);
+		profile = user.get('profile');
+
+		if(profile){
+			var converter = new Markdown.Converter();
+			this.$el.html(converter.makeHtml(profile.contact));
+		}
 		return this;
 	},
 });

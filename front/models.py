@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
 	user = models.ForeignKey(User, unique=True)
 	about = models.TextField(blank=True)
+	contact = models.TextField(blank=True)
+	image = models.ImageField(upload_to='user_profile_image', blank=True, null=True)
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
 # Copyright 2012 Trevor F. Smith (http://trevor.smith.name/) 
