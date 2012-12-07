@@ -40,6 +40,7 @@ class LogEntryPhotoInline(admin.TabularInline):
 
 class LogEntryAdmin(StyledAdmin):
 	list_display = ('__unicode__', 'log', 'created', 'publish')
+	list_filter = ('log', 'publish')
 	inlines = (LogEntryPhotoInline,)
 	date_hierarchy = 'created'
 	search_fields = ('subject', 'content')

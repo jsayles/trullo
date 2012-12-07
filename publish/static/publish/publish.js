@@ -1,6 +1,21 @@
 var publish = publish || {};
 publish.views = publish.views || {};
 
+publish.views.LogItemView = views.AbstractItemView.extend({
+	className: 'log-item-view',
+	render: function(){
+		this.$el.empty();
+		var title = $.el.h3($.el.a({href:this.model.get('absolute_url')}, this.model.get('title')));
+		this.$el.append(title);
+		return this;
+	},
+});
+
+publish.views.LogCollectionView = views.AbstractCollectionView.extend({
+	className: 'log-collection-view',
+	itemView: publish.views.LogItemView,
+});
+
 publish.views.IdeasView = Backbone.View.extend({
 	className: 'idea-view row-fluid',
 	initialize: function(){

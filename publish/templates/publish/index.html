@@ -1,0 +1,18 @@
+{% extends "publish/base.html" %}
+
+{% block title %}Publish | {% endblock %}
+
+{% block script-extras-page %}
+<script>
+	$(document).ready(function(){
+		$('a.index-nav').addClass('selected');
+	});
+	var logs = null;
+	var pageView = null;
+	schema.tastyPieSchema.on('populated', function(){
+		logs = new schema.LogCollection();
+		pageView = new publish.views.LogCollectionView({el:$('#page-view'), collection:logs});
+		logs.fetch();
+	});
+</script>
+{% endblock %}

@@ -1,6 +1,6 @@
-# Trullo: a vanity site for maker types.
+# Trullo: vanity sites for maker types.
 
-Trullo is a Django web application written in Python which runs on most flavors of UNIX.
+Trullo is a Django web application written in Python.
 
 # Installation
 

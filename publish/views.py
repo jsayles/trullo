@@ -63,85 +63,17 @@ def collect_form(request):
 			page_message = 'The <a href="%s">log entry</a> was created.' % reverse('publish.views.log_entry', args=[], kwargs={'slug':log_entry.log.slug, 'pk':log_entry.id})
 	return render_to_response('publish/collect_form.html', { 'collect_form':collect_form, 'page_message':page_message }, context_instance=RequestContext(request))
 
-def update_twitter(request):
-	log = get_object_or_404(Log, slug=settings.TWITTER_LOG_SLUG)
-	twitter_auth = tweepy.OAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
-	twitter_auth.set_access_token(settings.TWITTER_ACCESS_KEY, settings.TWITTER_ACCESS_SECRET)
-	twitter_api = tweepy.API(twitter_auth)
-	for status in twitter_api.user_timeline():
-		print status.id
-		if LogEntry.objects.filter(log=log, source_guid=str(status.id)).count() == 0:
-			entry = LogEntry(log=log)
-			entry.content = urlize(status.text)
-			entry.issued = status.created_at
-			entry.source_date = status.created_at
-			entry.source_guid = status.id
-			entry.source_url = 'http://twitter.com/%s/status/%s' % (settings.TWITTER_USERNAME, status.id)
-			entry.publish = True
-			entry.save()
-	return HttpResponse('Ok')
-
-def check_log_feeds(request):
-	for log_feed in LogFeed.objects.all():
-		try:
-			log_feed.check_feed()
-		except:
-			logging.exception("Error in reader import")
-	return render_to_response('publish/check_log_feeds.html', { }, context_instance=RequestContext(request))
-
 def publications(request):
-	return render_to_response('publish/publications.html', { 'publications':Publication.objects.all() }, context_instance=RequestContext(request))
+	return render_to_response('publish/publications.html', {}, context_instance=RequestContext(request))
 
 def merge(request):
-	if request.user.is_staff:
-		entries = LogEntry.objects.all()
-	else:
-		entries = LogEntry.objects.public_entries()
-	return render_to_response('publish/merge/splash.html', { 'entries':entries }, context_instance=RequestContext(request))
+	return render_to_response('publish/merge.html', { }, context_instance=RequestContext(request))
 
 def ideas(request):
 	return render_to_response('publish/ideas.html', { 'ideas':Idea.objects.all() }, context_instance=RequestContext(request))
-
-@login_required
-def mobile_index(request): return render_to_response('publish/mobile/index.html', { }, context_instance=RequestContext(request))
-
-@login_required
-def mobile_ideas(request):
-	message = None
-	if request.method == 'POST' and request.user.is_staff:
-		idea_form = IdeaForm(request.POST)
-		if idea_form.is_valid():
-			idea_form.save()
-			idea_form = IdeaForm()
-			message = 'Your idea was added.'
-	else:
-		idea_form = IdeaForm()
-	print message
-	return render_to_response('publish/mobile/ideas.html', { 'message':message, 'idea_form':idea_form, 'ideas':Idea.objects.all().order_by('title') }, context_instance=RequestContext(request))
-
-@login_required
-def mobile_idea(request, id):
-	idea = get_object_or_404(Idea, pk=id)
-	message = None
-	if request.method == 'POST' and request.user.is_staff:
-		idea_form = IdeaForm(request.POST, instance=idea)
-		if idea_form.is_valid():
-			idea_form.save()
-			idea_form = IdeaForm(instance=idea)
-			message = 'Your idea was added.'
-	else:
-		idea_form = IdeaForm(instance=idea)
-	print message
-	return render_to_response('publish/mobile/idea.html', { 'message':message, 'idea_form':idea_form, 'idea':idea }, context_instance=RequestContext(request))
 		
 def projects(request):
 	return render_to_response('publish/projects.html', { 'projects':Project.objects.all() }, context_instance=RequestContext(request))
-
-def links(request):
-	return render_to_response('publish/links.html', { 'links':Link.objects.all() }, context_instance=RequestContext(request))
-
-def image(request, id):
-	return render_to_response('publish/image.html', {}, context_instance=RequestContext(request))
 	
 def log(request, slug):
 	log = get_object_or_404(Log, slug=slug)
@@ -156,7 +88,7 @@ def log_year_archive(request, slug, year):
 	log = get_object_or_404(Log, slug=slug)
 	if not request.user.is_staff and not log.public:
 		return HttpResponseRedirect('/accounts/login/?next=%s' % request.path)
-	return render_to_response('publish/%s/archive.html' % log.template, { 'log':log, 'entries':LogEntry.objects.filter(log=log, issued__year=year),'archive_years':LogEntry.objects.filter(log=log).dates("issued", "year") }, context_instance=RequestContext(request))
+	return render_to_response('publish/log_archive.html', { 'log':log, 'entries':LogEntry.objects.filter(log=log, issued__year=year),'archive_years':LogEntry.objects.filter(log=log).dates("issued", "year") }, context_instance=RequestContext(request))
 
 def log_feed(request, slug):
 	log = get_object_or_404(Log, slug=slug)
@@ -202,41 +134,7 @@ def log_entry(request, slug, pk):
 		if not entry.publish: raise Http404
 		if not entry.log.public: raise Http404
 	
-	if request.method == 'POST':
-		comment_form = CommentForm(request.POST)
-	else:
-		comment_form = CommentForm()
-	if comment_form.is_valid() and entry.comments_open:
-		if validate_form_keypair(request.POST.get('form_key', None), request.POST.get('form_value', None)):
-			comment = Comment(author=comment_form.cleaned_data['author'], email=comment_form.cleaned_data['email'], url=comment_form.cleaned_data['url'])
-			comment.created = datetime.now()
-			comment.content_object = entry
-			comment.comment = strip_tags(comment_form.cleaned_data['comment'])
-			comment.ip = request.META['REMOTE_ADDR']
-			comment.save()
-		else:
-			logging.info('received an unvalidated form from %s: %s' % (request.META['REMOTE_ADDR'], comment_form.POST.get('author', None)))
-	form_key, form_value = generate_form_keypair()
-	return render_to_response('publish/log_entry.html', { 'log_entry':entry, 'log':entry.log, 'comment_form':comment_form, 'form_key':form_key, 'form_value':form_value, 'archive_years':LogEntry.objects.filter(log=entry.log).dates("issued", "year") }, context_instance=RequestContext(request))
-
-def generate_form_keypair():
-	"""Used by forms which want to doublecheck that they're not robotic entries.  Returns a unique but validatable key/value pair to be used in a hidden form element."""
-	return (str(time.time()), str(time.time()))
-
-def validate_form_keypair(key, value):
-	print 'validating: %s %s' % (key, value)
-	try:
-		timeout_minutes = 15
-		key_time = datetime.utcfromtimestamp(float(key))
-		value_time = datetime.utcfromtimestamp(float(value))
-		if key_time > datetime.utcnow(): return False
-		if key_time < datetime.utcnow() - timedelta(minutes=timeout_minutes): return False
-		if value_time > datetime.utcnow(): return False
-		if value_time < datetime.utcnow() - timedelta(minutes=timeout_minutes): return False
-	except:
-		traceback.print_exc()
-		return False
-	return True
+	return render_to_response('publish/log_entry.html', { 'log_entry':entry, 'archive_years':LogEntry.objects.filter(log=entry.log).dates("issued", "year") }, context_instance=RequestContext(request))
 
 # Copyright 2012 Trevor F. Smith (http://trevor.smith.name/) 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.

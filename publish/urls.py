@@ -2,20 +2,14 @@ from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('',
 	(r'^$', 'publish.views.index'),
-	(r'^link/$', 'publish.views.links'),
 	(r'^idea/$', 'publish.views.ideas'),
 	(r'^publication/$', 'publish.views.publications'),
 	(r'^project/$', 'publish.views.projects'),
-	(r'^image/(?P<id>[\d]+)/$', 'publish.views.image'),
 
 	(r'^merge/$', 'publish.views.merge'),
 
 	(r'^collect/$', 'publish.views.collect'),
 	(r'^collect-form/$', 'publish.views.collect_form'),
-
-	(r'^m/$', 'publish.views.mobile_index'),
-	(r'^m/idea/$', 'publish.views.mobile_ideas'),
-	(r'^m/idea/(?P<id>\d+)/$', 'publish.views.mobile_idea'),
 
 	(r'^(?P<slug>[^/]+)/$', 'publish.views.log'),
 	(r'^(?P<slug>[^/]+)/archive/$', 'publish.views.log_archive'),

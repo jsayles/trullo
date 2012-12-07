@@ -6,14 +6,6 @@ SITE_ID = 1
 
 SECRET_KEY = 'SOME_JUNK_HERE'
 
-TWITTER_USERNAME = 'username'
-TWITTER_LOG_SLUG = 'tweets'
-TWITTER_CONSUMER_KEY = 'OAuth consumer key'
-TWITTER_CONSUMER_SECRET = 'OAuth consumer secret'
-TWITTER_ACCESS_KEY = 'OAuth access key'
-TWITTER_ACCESS_SECRET = 'OAuth access secret'
-
-LOG_FILE_PATH = '/tmp/trullo.log'
 ADMINS = (('Your Name', 'something-or-other@exampleolio.com'),)
 MANAGERS = ADMINS
 
@@ -35,5 +27,6 @@ DATABASES = {
     }
 }
 
+LOG_FILE_PATH = '/tmp/trullo.log'
 import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename=LOG_FILE_PATH, filemode = 'w')

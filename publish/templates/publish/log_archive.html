@@ -1,0 +1,17 @@
+{% extends "publish/base.html" %}
+
+{% block title %}{{log.title|safe}} Archive | {% endblock %}
+
+{% block script-extras-page %}
+<script>
+	$(document).ready(function(){
+		$('a.index-nav').addClass('selected');
+	});
+	var log = null;
+	var pageView = null;
+	schema.tastyPieSchema.on('populated', function(){
+		log = new schema.Log({id:{{log.id}}})
+		log.fetch();
+	});
+</script>
+{% endblock %}
