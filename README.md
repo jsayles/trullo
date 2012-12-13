@@ -4,7 +4,7 @@ Trullo is a Django web application written in Python.
 
 # Installation
 
-	git clone TBD
+	git clone git://github.com/TrevorFSmith/trullo.git
 	cd trullo
 	pip install -r requirements.txt
 	cp local_settings.example local_settings.py
